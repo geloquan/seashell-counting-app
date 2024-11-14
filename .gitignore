@@ -1,0 +1,64 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Ignore Gradle files
+.gradle/
+build/
+.idea/
+.gradletasknamecache
+.gradlebuildfilecache
+.gradletaskcache
+.gradlebuild
+
+# Ignore IntelliJ IDEA files
+*.iml
+*.ipr
+*.iws
+.idea/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/libraries
+
+# Ignore Android-specific files (if applicable)
+.cxx/
+.externalNativeBuild/
+.local/
+.gradle/
+app/build/
+.externalNativeBuild/
+
+# Ignore macOS-specific files
+.DS_Store
+
+# Ignore Kotlin/Java-related generated files
+out/
+*.class
+
+# Ignore log files
+*.log
+
+# Ignore unnecessary files from various operating systems
+.vscode/
+Thumbs.db
+*.swp
+*.bak
+*~
+
+# Ignore Environment Variable files
+.env
+*.env
