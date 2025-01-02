@@ -2,5 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="background">#FCF7F8</color>
+    <color name="dark">#011936</color>
+    <color name="btn">#ffe0b7</color>
+    <color name="none"></color>
+
     <color name="bounding_box_color">#FF0000</color>
 </resources>

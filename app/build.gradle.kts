@@ -1,3 +1,5 @@
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -46,7 +48,6 @@ android {
         }
     }
 }
-
 dependencies {
 
     implementation(libs.androidx.appcompat)
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.play.services.tasks)
     implementation(libs.play.services.mlkit.text.recognition.common)
     implementation(libs.play.services.mlkit.text.recognition)
+    implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,4 +73,5 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
 
+    implementation( libs.material.v1120)
 }

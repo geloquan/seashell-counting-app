@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_above="@+id/loadingProgressBar"
+        android:layout_alignStart="@+id/loadingProgressBar"
+        android:layout_marginStart="-94dp"
+        android:src="@drawable/qualt_icon" />
+
+    <ImageView
+        android:id="@+id/seashell_logo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignBottom="@+id/logo"
+        android:layout_marginStart="2dp"
+        android:layout_toEndOf="@+id/logo"
+        android:src="@mipmap/ic_seashell_v2" />
+
+    <ProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        style="?android:attr/progressBarStyleLarge"
+        android:indeterminateTint="#1bddff"/>
+
+    <TextView
+        android:id="@+id/loadingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/loadingProgressBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Processing Image..."
+        android:textColor="@color/dark"
+        android:textSize="18sp"/>
+
+</RelativeLayout>

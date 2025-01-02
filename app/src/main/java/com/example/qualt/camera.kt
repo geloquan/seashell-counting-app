@@ -70,7 +70,6 @@ class camera : AppCompatActivity(), Capture.CaptureListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = CameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

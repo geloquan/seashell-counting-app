@@ -1,71 +1,68 @@
 package com.example.qualt
 
-import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.enableEdgeToEdge
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.qualt.databinding.ActivityMain2Binding
-import com.example.qualt.databinding.CameraBinding
-import androidx.camera.core.AspectRatio
-import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import android.content.pm.PackageManager
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.example.qualt.databinding.ActivityLoadingScreenBinding
+import com.example.qualt.databinding.ActivityMain2Binding
+import kotlinx.coroutines.CompletableDeferred
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+
 class MainActivity2 : AppCompatActivity(), Detector.DetectorListener {
     private lateinit var binding: ActivityMain2Binding
-    private val isFrontCamera = false
-
-    private var preview: Preview? = null
+    private lateinit var loadingBinding: ActivityLoadingScreenBinding
     private var imageCapture: ImageCapture? = null
-    private var camera: Camera? = null
-    private var cameraProvider: ProcessCameraProvider? = null
+    private lateinit var cameraExecutor: ExecutorService
     private lateinit var detector: Detector
 
-    private lateinit var cameraExecutor: ExecutorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         binding = ActivityMain2Binding.inflate(layoutInflater)
+
+        loadingBinding = ActivityLoadingScreenBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
-        // Initialize detector
+
         detector = Detector(baseContext, Constants.MODEL_PATH, this)
         detector.setup()
 
-        // Set up capture button click listener
         binding.imageCaptureBtnAct2.setOnClickListener {
+
             captureImage()
         }
 
+        val back: ImageView = findViewById(R.id.back)
+        back.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
         startCamera()
-
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     private fun captureImage() {
         val imageCapture = imageCapture ?: return
+
+        // Switch to loading screen
+        setContentView(loadingBinding.root)
 
         imageCapture.takePicture(
             ContextCompat.getMainExecutor(this),
@@ -76,6 +73,10 @@ class MainActivity2 : AppCompatActivity(), Detector.DetectorListener {
 
                 override fun onError(exception: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exception.message}", exception)
+                    // Return to camera view on error
+                    runOnUiThread {
+                        setContentView(binding.root)
+                    }
                 }
             }
         )
@@ -83,145 +84,125 @@ class MainActivity2 : AppCompatActivity(), Detector.DetectorListener {
 
     private fun processImage(imageProxy: ImageProxy) {
         val bitmap = imageProxy.toBitmap()
-        val matrix = Matrix().apply {
-            postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
-        }
 
-        val rotatedBitmap = Bitmap.createBitmap(
-            bitmap, 0, 0, bitmap.width, bitmap.height,
-            matrix, true
-        )
+        detector.detect(bitmap)
 
-        detector.detect(rotatedBitmap)
         imageProxy.close()
     }
 
-    private fun bindCameraUseCases() {
-        val cameraProvider = cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
 
-        val cameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-            .build()
-
-        preview = Preview.Builder()
-            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-            .build()
-
-        imageCapture = ImageCapture.Builder()
-            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-            .build()
-
-        cameraProvider.unbindAll()
-
-        try {
-            camera = cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageCapture
-            )
-
-            preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-        } catch(exc: Exception) {
-            Log.e(TAG, "Use case binding failed", exc)
-        }
-    }
-
-    private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener({
-            cameraProvider = cameraProviderFuture.get()
-            bindCameraUseCases()
-        }, ContextCompat.getMainExecutor(this))
-    }
-
-    companion object {
-        private const val TAG = "Camera"
-        private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS = mutableListOf (
-            Manifest.permission.CAMERA
-        ).toTypedArray()
-    }
-
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()) {
-        if (it[Manifest.permission.CAMERA] == true) { startCamera() }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        detector.clear()
-        cameraExecutor.shutdown()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (allPermissionsGranted()){
-            startCamera()
-        } else {
-            requestPermissionLauncher.launch(REQUIRED_PERMISSIONS)
-        }
-    }
-
-    override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
+    override fun onDetect(boundingBoxes: List<BoundingBox>, classConfidences: Map<String, Float>) {
         runOnUiThread {
-            binding.overlay.apply {
-                setResults(boundingBoxes)
-                invalidate()
+            val intent = Intent(this, ImageResultActivity::class.java)
+
+            val classCounts = boundingBoxes.groupingBy { it.clsName }.eachCount()
+            val classConfidences = boundingBoxes.groupBy { it.clsName }
+                .mapValues { (_, boxes) -> boxes.map { it.confidence }.average().toFloat() }
+
+            classCounts["punaw"]?.let { punawCount ->
+                intent.putExtra("punaw_count", punawCount)
+                intent.putExtra("punaw_conf", classConfidences["punaw"] ?: 0f)
+                val confidencePercentage = ((classConfidences["punaw"] ?: 0f) * 100).toInt()
+                intent.putExtra("punaw_conf_bar", confidencePercentage)
             }
-            if (boundingBoxes.isEmpty()) {
-                Toast.makeText(
-                    this, // Replace with your actual activity name
-                    "No objects detected",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                val classCounts = mutableMapOf<String, Int>()
 
-                for (box in boundingBoxes) {
-                    val clsName = box.clsName
-                    classCounts[clsName] = (classCounts[clsName] ?: 0) + 1
-                }
-
-                val intent = Intent(this, ImageResultActivity::class.java)
-
-                classCounts["punaw"]?.let { punawCount ->
-                    intent.putExtra("punaw_count", punawCount)
-                }
-
-                classCounts["greenshell"]?.let { greenshellCount ->
-                    intent.putExtra("greenshell_count", greenshellCount)
-                }
-
-                classCounts["tuway"]?.let { tuwayCount ->
-                    intent.putExtra("tuway_count", tuwayCount)
-                }
-
-                startActivity(intent)  // Start the activity with all counts added as extras
-
-                //val message = buildString {
-                //    append("Detected ${classCounts.size} unique class(es):\n")
-                //    classCounts.forEach { (cls, count) ->
-                //        append("$cls: $count\n")
-                //    }
-                //}.trim()
-//
-                //Toast.makeText(
-                //    this,
-                //    message,
-                //    Toast.LENGTH_LONG
-                //).show()
+            classCounts["greenshell"]?.let { greenshellCount ->
+                intent.putExtra("greenshell_count", greenshellCount)
+                intent.putExtra("greenshell_conf", classConfidences["greenshell"] ?: 0f)
+                val confidencePercentage = ((classConfidences["greenshell"] ?: 0f) * 100).toInt()
+                intent.putExtra("greenshell_conf_bar", confidencePercentage)
             }
+
+            classCounts["tuway"]?.let { tuwayCount ->
+                intent.putExtra("tuway_count", tuwayCount)
+                intent.putExtra("tuway_conf", classConfidences["tuway"] ?: 0f)
+                val confidencePercentage = ((classConfidences["tuway"] ?: 0f) * 100).toInt()
+                intent.putExtra("tuway_conf_bar", confidencePercentage)
+            }
+
+            val notShellClasses = boundingBoxes.filterNot { it.clsName in listOf("punaw", "greenshell", "tuway") }
+                .groupBy { it.clsName }
+            if (notShellClasses.isNotEmpty()) {
+                var totalNotShellCount = 0
+                var totalConfidence = 0f
+
+                notShellClasses.forEach { (clsName, boxes) ->
+                    val count = boxes.size
+                    val averageConfidence = boxes.map { it.confidence }.average().toFloat()
+
+                    totalNotShellCount += count
+                    totalConfidence += averageConfidence * count
+
+                }
+
+                val overallNotShellConfidence = if (totalNotShellCount > 0) totalConfidence / totalNotShellCount else 0f
+                val confidencePercentage = (overallNotShellConfidence * 100).toInt()
+
+                intent.putExtra("notshell_count", totalNotShellCount)
+                intent.putExtra("notshell_conf", overallNotShellConfidence)
+                intent.putExtra("notshell_conf_bar", confidencePercentage)
+            }
+
+            // Start results activity
+            startActivity(intent)
+            finish()
         }
     }
 
     override fun onEmptyDetect() {
         runOnUiThread {
-            binding.overlay.invalidate()
+            // Handle no detection scenario
+            setContentView(binding.root)
+            // Optionally show a toast or dialog
+            android.widget.Toast.makeText(
+                this,
+                "No objects detected",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
         }
+    }
+
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+
+        cameraProviderFuture.addListener({
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            // Preview use case
+            val preview = Preview.Builder()
+                .build()
+                .also {
+                    it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+                }
+
+            // Image capture use case
+            imageCapture = ImageCapture.Builder().build()
+
+            // Select back camera as default
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            try {
+                // Unbind use cases before rebinding
+                cameraProvider.unbindAll()
+
+                // Bind use cases to camera
+                cameraProvider.bindToLifecycle(
+                    this, cameraSelector, preview, imageCapture)
+
+            } catch(exc: Exception) {
+                Log.e(TAG, "Use case binding failed", exc)
+            }
+
+        }, ContextCompat.getMainExecutor(this))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
+        detector.clear()
+    }
+
+    companion object {
+        private const val TAG = "CameraXApp"
     }
 }

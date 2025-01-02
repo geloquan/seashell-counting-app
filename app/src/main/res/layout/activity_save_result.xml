@@ -5,50 +5,315 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".SaveResultActivity">
+
+    <TextView
+        android:id="@+id/notshell_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="55dp"
+        android:text="not shell"
+        android:textColor="@color/dark"
+        android:textSize="20dp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@+id/ns_label_conf"
+        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintTop_toTopOf="@+id/ns_count_label" />
+
+    <TextView
+        android:id="@+id/mudclam_conf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:text="->"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="@+id/mucc_label_conf"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tuway_count" />
+
+    <TextView
+        android:id="@+id/ns_conf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:text="->"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ns_label_conf"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ns_count" />
+
+    <TextView
+        android:id="@+id/mucc_label_conf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="confidence"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintStart_toStartOf="@+id/mucc_label"
+        app:layout_constraintTop_toBottomOf="@+id/mucc_label" />
+
+    <TextView
+        android:id="@+id/ns_label_conf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="confidence"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintStart_toStartOf="@+id/ns_count_label"
+        app:layout_constraintTop_toBottomOf="@+id/ns_count_label" />
+
+    <TextView
+        android:id="@+id/mucc_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="count"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/gmc_label"
+        app:layout_constraintTop_toBottomOf="@+id/gmf_label" />
+
+    <TextView
+        android:id="@+id/ns_count_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="count"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/mucc_label"
+        app:layout_constraintTop_toBottomOf="@+id/mucc_label_conf" />
+
+    <TextView
+        android:id="@+id/greenshell_conf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:text="->"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="@+id/gmf_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/greenshell_count" />
+
+    <TextView
+        android:id="@+id/gmf_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="confidence"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintStart_toStartOf="@+id/gmc_label"
+        app:layout_constraintTop_toBottomOf="@+id/gmc_label" />
+
+    <TextView
+        android:id="@+id/gmc_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="count"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/mcc_label"
+        app:layout_constraintTop_toBottomOf="@+id/mcf_label" />
+
+    <TextView
+        android:id="@+id/mcc_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="43dp"
+        android:text="count"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
+
+    <TextView
+        android:id="@+id/punaw_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="55dp"
+        android:text="Manila Clam"
+        android:textColor="@color/dark"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/mcf_label"
+        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintTop_toTopOf="@+id/mcc_label" />
+
+    <TextView
+        android:id="@+id/mcf_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="confidence"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintStart_toStartOf="@+id/mcc_label"
+        app:layout_constraintTop_toBottomOf="@+id/mcc_label" />
+
+    <TextView
+        android:id="@+id/punaw_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="->"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mcc_label" />
+
+    <TextView
+        android:id="@+id/punaw_conf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="->"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="@+id/mcf_label"
+        app:layout_constraintEnd_toEndOf="@+id/punaw_count"
+        app:layout_constraintStart_toStartOf="@+id/punaw_count"
+        app:layout_constraintTop_toBottomOf="@+id/punaw_count" />
+
+
+    <TextView
+        android:id="@+id/greenshell_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="55dp"
+        android:text="Green Mussel"
+        android:textColor="@color/dark"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/gmf_label"
+        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintTop_toTopOf="@+id/gmc_label" />
+
+    <TextView
+        android:id="@+id/greenshell_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:text="->"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gmc_label" />
+
+    <TextView
+        android:id="@+id/tuway_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mud Clam"
+        android:textColor="@color/dark"
+        android:textSize="20dp"
+        android:layout_marginEnd="55dp"
+        app:layout_constraintBottom_toBottomOf="@+id/mucc_label_conf"
+        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintTop_toTopOf="@+id/mucc_label" />
+
+    <TextView
+        android:id="@+id/tuway_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:text="->"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mucc_label" />
+
+    <TextView
+        android:id="@+id/ns_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:text="->"
+        android:textColor="@color/dark"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ns_count_label" />
 
     <TextView
         android:id="@+id/total_shell_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="205dp"
-        android:layout_marginTop="87dp"
         android:layout_marginEnd="206dp"
         android:text=""
+        android:textColor="@color/dark"
         android:textSize="60dp"
+        app:layout_constraintBottom_toTopOf="@+id/total_shell_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.513"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
     <TextView
         android:id="@+id/total_shell_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="177dp"
-        android:layout_marginEnd="1dp"
-        android:text="TOTAL SHELLS"
+        android:layout_marginBottom="204dp"
+        android:text="TOTAL\nSEASHELLS"
+        android:textAlignment="center"
+        android:textColor="@color/dark"
         android:textSize="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="436dp"
+        android:src="@drawable/qualt_icon"
+        app:layout_constraintBottom_toTopOf="@+id/total_shell_label"
+        app:layout_constraintStart_toStartOf="@+id/total_shell_label"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.46" />
+
+    <ImageView
+        android:id="@+id/shell_logo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentEnd="true"
+        android:src="@mipmap/ic_seashell_v2"
+        app:layout_constraintBottom_toBottomOf="@+id/logo"
+        app:layout_constraintStart_toEndOf="@+id/logo" />
 
     <Button
-        android:id="@+id/analytics_btn"
-        android:layout_width="150dp"
-        android:layout_height="59dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginBottom="45dp"
-        android:text="Analytics"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:id="@+id/logs_btn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@color/none"
+        android:drawableStart="@drawable/logs_1"
+        app:layout_constraintBottom_toBottomOf="@+id/home_button"
+        app:layout_constraintEnd_toStartOf="@+id/camera_btn"
+        app:layout_constraintStart_toEndOf="@+id/home_button" />
+
     <Button
         android:id="@+id/camera_btn"
-        android:layout_width="151dp"
-        android:layout_height="59dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="45dp"
-        android:text="Camera"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/none"
+        android:drawableStart="@drawable/camera"
+        app:layout_constraintBottom_toBottomOf="@+id/home_button"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/home_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@color/none"
+        android:drawableRight="@drawable/house"
+        android:layout_marginLeft="24dp"
+        android:layout_marginBottom="45dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

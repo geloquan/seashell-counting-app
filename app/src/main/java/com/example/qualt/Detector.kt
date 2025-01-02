@@ -3,33 +3,34 @@ package com.example.qualt
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
+import android.util.Log
 import android.widget.Toast
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 
-class Detector (
+class Detector(
     private val context: Context,
     private val modelPath: String,
-    private val detectorListener: DetectorListener
+    var detectorListener: DetectorListener
 ) {
     interface DetectorListener {
-        fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long)
-
+        fun onDetect(boundingBoxes: List<BoundingBox>, classConfidences: Map<String, Float>)
         fun onEmptyDetect()
     }
 
     private var interpreter: Interpreter? = null
-
     private val labelPath = "labels.txt"
     private var labels = mutableListOf<String>()
     private var tensorWidth = 0
@@ -42,7 +43,7 @@ class Detector (
         private const val INPUT_STANDARD_DEVIATION = 255f
         private val INPUT_IMAGE_TYPE = DataType.FLOAT32
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
-        private const val CONFIDENCE_THRESHOLD = 0.65f
+        private const val CONFIDENCE_THRESHOLD = 0.4f
         private const val IOU_THRESHOLD = 0.5f
     }
 
@@ -54,8 +55,9 @@ class Detector (
     fun setup() {
         try {
             val model = FileUtil.loadMappedFile(context, modelPath)
-            val options = Interpreter.Options()
-            options.numThreads = 32
+            val options = Interpreter.Options().apply {
+                numThreads = Runtime.getRuntime().availableProcessors()
+            }
 
             interpreter = Interpreter(model, options)
 
@@ -67,19 +69,25 @@ class Detector (
             numChannel = outputShape?.get(1) ?: 0
             numElements = outputShape?.get(2) ?: 0
 
-            val inputStream: InputStream = context.assets.open(labelPath)
-            val reader = BufferedReader(InputStreamReader(inputStream))
-            var line: String? = reader.readLine()
-            while (line != null && line != "") {
-                labels.add(line)
-                line = reader.readLine()
-            }
-            reader.close()
-            inputStream.close()
+            loadLabels()
         } catch (e: IOException) {
             e.printStackTrace()
         }
+    }
 
+    private fun loadLabels() {
+        try {
+            context.assets.open(labelPath).use { inputStream ->
+                BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                    var line: String?
+                    while (reader.readLine().also { line = it } != null) {
+                        line?.takeIf { it.isNotBlank() }?.let { labels.add(it) }
+                    }
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
     fun detect(frame: Bitmap) {
@@ -88,8 +96,6 @@ class Detector (
         if (tensorHeight == 0) return
         if (numChannel == 0) return
         if (numElements == 0) return
-
-        var inferenceTime = SystemClock.uptimeMillis()
 
         val resizedBitmap = Bitmap.createScaledBitmap(frame, tensorWidth, tensorHeight, false)
 
@@ -102,16 +108,14 @@ class Detector (
         val output = TensorBuffer.createFixedSize(intArrayOf(1, numChannel, numElements), OUTPUT_IMAGE_TYPE)
         interpreter?.run(imageBuffer, output.buffer)
 
-        val bestBoxes = bestBox(output.floatArray, frame)
-        inferenceTime = SystemClock.uptimeMillis() - inferenceTime
+        val (bestBoxes, classConfidences) = bestBox(output.floatArray, frame)
 
-
-        if (bestBoxes == null) {
+        if (bestBoxes.isEmpty()) {
             detectorListener.onEmptyDetect()
             return
         }
 
-        detectorListener.onDetect(bestBoxes, inferenceTime)
+        detectorListener.onDetect(bestBoxes, classConfidences)
     }
 
     private fun calculateIoU(box1: BoundingBox, box2: BoundingBox): Float {
@@ -149,7 +153,6 @@ class Detector (
             for (j in i + 1 until boxes.size) {
                 if (j in processedBoxes) continue
 
-                // Check if the box overlaps with any box in the current group
                 val overlapsWithGroup = currentGroup.any { box ->
                     calculateIoU(box, boxes[j]) > iouThreshold
                 }
@@ -167,21 +170,19 @@ class Detector (
     }
 
     private fun selectBestBoxForGroup(group: List<BoundingBox>): BoundingBox {
-        // Count occurrences of each class
         val classCount = group.groupBy { it.cls }.mapValues { it.value.size }
-
-        // Get the most common class
         val mostCommonClass = classCount.maxByOrNull { it.value }?.key ?: group[0].cls
-
-        // Among boxes with the most common class, select the one with highest confidence
         return group.filter { it.cls == mostCommonClass }
             .maxByOrNull { it.confidence }
             ?: group[0]
     }
 
-    private fun bestBox(array: FloatArray, frame: Bitmap): List<BoundingBox> {
+    private fun bestBox(array: FloatArray, frame: Bitmap): Pair<List<BoundingBox>, Map<String, Float>> {
         val boundingBoxes = mutableListOf<BoundingBox>()
+        val confidenceSums = mutableMapOf<String, Float>()
+        val detectionCounts = mutableMapOf<String, Int>()
 
+        // First pass: collect all valid bounding boxes and confidence sums
         for (c in 0 until numElements) {
             var maxConf = -1.0f
             var maxIdx = -1
@@ -198,18 +199,20 @@ class Detector (
 
             if (maxConf > CONFIDENCE_THRESHOLD) {
                 val clsName = labels[maxIdx]
-                val cx = array[c] // 0
-                val cy = array[c + numElements] // 1
+                val cx = array[c]
+                val cy = array[c + numElements]
                 val w = array[c + numElements * 2]
                 val h = array[c + numElements * 3]
                 val x1 = cx - (w/2F)
                 val y1 = cy - (h/2F)
                 val x2 = cx + (w/2F)
                 val y2 = cy + (h/2F)
-                if (x1 < 0F || x1 > 1F) continue
-                if (y1 < 0F || y1 > 1F) continue
-                if (x2 < 0F || x2 > 1F) continue
-                if (y2 < 0F || y2 > 1F) continue
+
+                if (x1 < 0F || x1 > 1F || y1 < 0F || y1 > 1F || x2 < 0F || x2 > 1F || y2 < 0F || y2 > 1F) continue
+
+                // Update confidence sums and counts
+                confidenceSums[clsName] = confidenceSums.getOrDefault(clsName, 0f) + maxConf
+                detectionCounts[clsName] = detectionCounts.getOrDefault(clsName, 0) + 1
 
                 boundingBoxes.add(
                     BoundingBox(
@@ -221,14 +224,20 @@ class Detector (
             }
         }
 
+        // Calculate average confidence for each class
+        val classConfidences = confidenceSums.mapValues { (className, sum) ->
+            sum / detectionCounts.getOrDefault(className, 1)
+        }
+
         // Group overlapping boxes and select the best representative for each group
         val groups = findOverlappingBoxes(boundingBoxes)
-        return groups.map { group -> selectBestBoxForGroup(group) }
-    }
+        val finalBoxes = groups.map { group -> selectBestBoxForGroup(group) }
 
+        return Pair(finalBoxes, classConfidences)
+    }
 
     fun clear() {
         interpreter?.close()
-        interpreter=null
+        interpreter = null
     }
 }
