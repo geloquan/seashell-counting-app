@@ -8,17 +8,75 @@
     android:background="@color/background"
     tools:context=".SaveResultActivity">
 
+    <LinearLayout
+        android:id="@+id/grrenshell_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/greenshell_conf">
+        <!-- Empty space to take up 5% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.05"
+            android:background="@android:color/transparent" />
+
+        <!-- Main line taking up 90% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.9"
+            android:background="@android:color/black" />
+
+        <!-- Empty space to take up 5% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.05"
+            android:background="@android:color/transparent" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mud_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/mudclam_conf">
+        <!-- Empty space to take up 5% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.05"
+            android:background="@android:color/transparent" />
+
+        <!-- Main line taking up 90% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.9"
+            android:background="@android:color/black" />
+
+        <!-- Empty space to take up 5% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.05"
+            android:background="@android:color/transparent" />
+    </LinearLayout>
     <TextView
         android:id="@+id/notshell_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="55dp"
         android:text="not shell"
         android:textColor="@color/dark"
         android:textSize="20dp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/ns_label_conf"
-        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintStart_toStartOf="@+id/punaw_label"
         app:layout_constraintTop_toTopOf="@+id/ns_count_label" />
 
     <TextView
@@ -29,9 +87,8 @@
         android:text="->"
         android:textColor="@color/dark"
         android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/mucc_label_conf"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tuway_count" />
+        app:layout_constraintTop_toBottomOf="@+id/mucc_label_conf" />
 
     <TextView
         android:id="@+id/ns_conf"
@@ -41,9 +98,8 @@
         android:text="->"
         android:textColor="@color/dark"
         android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/ns_label_conf"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ns_count" />
+        app:layout_constraintTop_toBottomOf="@+id/ns_label_conf" />
 
     <TextView
         android:id="@+id/mucc_label_conf"
@@ -69,23 +125,21 @@
         android:id="@+id/mucc_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
         android:text="count"
         android:textColor="@color/dark"
         android:textSize="15dp"
         app:layout_constraintEnd_toEndOf="@+id/gmc_label"
-        app:layout_constraintTop_toBottomOf="@+id/gmf_label" />
+        app:layout_constraintTop_toBottomOf="@+id/grrenshell_line" />
 
     <TextView
         android:id="@+id/ns_count_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
         android:text="count"
         android:textColor="@color/dark"
         android:textSize="15dp"
         app:layout_constraintEnd_toEndOf="@+id/mucc_label"
-        app:layout_constraintTop_toBottomOf="@+id/mucc_label_conf" />
+        app:layout_constraintTop_toBottomOf="@+id/mud_line" />
 
     <TextView
         android:id="@+id/greenshell_conf"
@@ -95,9 +149,8 @@
         android:text="->"
         android:textColor="@color/dark"
         android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/gmf_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/greenshell_count" />
+        app:layout_constraintTop_toBottomOf="@+id/gmf_label" />
 
     <TextView
         android:id="@+id/gmf_label"
@@ -113,12 +166,11 @@
         android:id="@+id/gmc_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
         android:text="count"
         android:textColor="@color/dark"
         android:textSize="15dp"
         app:layout_constraintEnd_toEndOf="@+id/mcc_label"
-        app:layout_constraintTop_toBottomOf="@+id/mcf_label" />
+        app:layout_constraintTop_toBottomOf="@+id/manila_clam_line" />
 
     <TextView
         android:id="@+id/mcc_label"
@@ -133,14 +185,15 @@
 
     <TextView
         android:id="@+id/punaw_label"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="55dp"
         android:text="Manila Clam"
         android:textColor="@color/dark"
         android:textSize="20dp"
+        android:textStyle="bold"
+        android:layout_marginLeft="43dp"
         app:layout_constraintBottom_toBottomOf="@+id/mcf_label"
-        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/mcc_label" />
 
     <TextView
@@ -168,25 +221,55 @@
         android:id="@+id/punaw_conf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
         android:text="->"
         android:textColor="@color/dark"
         android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/mcf_label"
-        app:layout_constraintEnd_toEndOf="@+id/punaw_count"
-        app:layout_constraintStart_toStartOf="@+id/punaw_count"
-        app:layout_constraintTop_toBottomOf="@+id/punaw_count" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mcf_label" />
+
+    <LinearLayout
+        android:id="@+id/manila_clam_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/punaw_conf">
+        <!-- Empty space to take up 5% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.05"
+            android:background="@android:color/transparent" />
+
+        <!-- Main line taking up 90% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.9"
+            android:background="@android:color/black" />
+
+        <!-- Empty space to take up 5% of the width -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.05"
+            android:background="@android:color/transparent" />
+    </LinearLayout>
+
 
 
     <TextView
         android:id="@+id/greenshell_label"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="55dp"
         android:text="Green Mussel"
         android:textColor="@color/dark"
         android:textSize="20dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/gmf_label"
-        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintStart_toStartOf="@+id/punaw_label"
         app:layout_constraintTop_toTopOf="@+id/gmc_label" />
 
     <TextView
@@ -202,14 +285,14 @@
 
     <TextView
         android:id="@+id/tuway_label"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="Mud Clam"
         android:textColor="@color/dark"
         android:textSize="20dp"
-        android:layout_marginEnd="55dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/mucc_label_conf"
-        app:layout_constraintEnd_toEndOf="@+id/logo"
+        app:layout_constraintStart_toStartOf="@+id/punaw_label"
         app:layout_constraintTop_toTopOf="@+id/mucc_label" />
 
     <TextView
@@ -234,27 +317,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/ns_count_label" />
 
+
     <TextView
         android:id="@+id/total_shell_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="205dp"
-        android:layout_marginEnd="206dp"
         android:text=""
         android:textColor="@color/dark"
-        android:textSize="60dp"
-        app:layout_constraintBottom_toTopOf="@+id/total_shell_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.513"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        android:textSize="30dp"
+        app:layout_constraintStart_toStartOf="@+id/seashell_count_label"
+        app:layout_constraintTop_toBottomOf="@+id/seashell_count_label" />
 
     <TextView
-        android:id="@+id/total_shell_label"
+        android:id="@+id/total_shell_conf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="204dp"
-        android:text="TOTAL\nSEASHELLS"
+        android:text=""
+        android:textColor="@color/dark"
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="@+id/seashell_conf_label"
+        app:layout_constraintTop_toBottomOf="@+id/seashell_conf_label" />
+
+    <TextView
+        android:id="@+id/seashell_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="276dp"
+        android:text="SEASHELL"
+        android:textStyle="bold"
         android:textAlignment="center"
         android:textColor="@color/dark"
         android:textSize="60dp"
@@ -262,19 +352,41 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/seashell_count_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="count"
+        android:textAlignment="center"
+        android:textColor="@color/dark"
+        android:textSize="30dp"
+        app:layout_constraintStart_toStartOf="@+id/seashell_label"
+        app:layout_constraintTop_toBottomOf="@+id/seashell_label" />
+
+    <TextView
+        android:id="@+id/seashell_conf_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="confidence"
+        android:textAlignment="center"
+        android:textColor="@color/dark"
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="@+id/seashell_label"
+        app:layout_constraintTop_toTopOf="@+id/seashell_count_label" />
+
     <ImageView
         android:id="@+id/logo"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="48dp"
         android:layout_marginTop="50dp"
         android:layout_marginBottom="436dp"
         android:src="@drawable/qualt_icon"
-        app:layout_constraintBottom_toTopOf="@+id/total_shell_label"
-        app:layout_constraintStart_toStartOf="@+id/total_shell_label"
+        app:layout_constraintBottom_toTopOf="@+id/seashell_label"
+        app:layout_constraintStart_toStartOf="@+id/seashell_label"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.46" />
+        app:layout_constraintVertical_bias="0.47" />
 
     <ImageView
         android:id="@+id/shell_logo"
@@ -315,5 +427,6 @@
         android:layout_marginBottom="45dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

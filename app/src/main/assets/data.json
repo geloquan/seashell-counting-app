@@ -1,5 +1,17 @@
 {
+  "id": 0,
+
   "punaw": 0,
+  "punaw_conf": 0.0,
+
   "greenshell": 0,
-  "tuway": 0
+  "greenshell_conf": 0.0,
+
+  "tuway": 0,
+  "tuway_conf": 0.0,
+
+  "notshell": 0,
+  "notshell_conf": 0.0,
+
+  "datetime": ""
 }

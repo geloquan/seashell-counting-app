@@ -65,7 +65,7 @@ class ImageResultActivity : AppCompatActivity() {
                 intent.putExtra("punaw_conf", punaw_confidence)
                 intent.putExtra("greenshell_conf", greenshell_conf)
                 intent.putExtra("tuway_conf", tuway_conf)
-                intent.putExtra("notshell_conf", notshell_count)
+                intent.putExtra("notshell_conf", notshell_conf)
 
                 startActivity(intent)
                 finish()

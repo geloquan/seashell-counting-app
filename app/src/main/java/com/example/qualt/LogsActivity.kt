@@ -4,9 +4,15 @@ import DatabaseManager
 import Row
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TableLayout
+import android.widget.TableRow
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -53,6 +59,10 @@ class LogsActivity : AppCompatActivity() {
         refreshLogs()
     }
 
+    private fun combinePer() {
+
+    }
+
     private fun refreshLogs() {
         // Clear existing views in the logs container
         linearLayout.removeAllViews()
@@ -62,7 +72,17 @@ class LogsActivity : AppCompatActivity() {
 
         // Update total shells at the top
         val totalShells = databaseData.total_shells()
-        totalShellsTextView.text = "Total Shells: $totalShells"
+
+        val total_shell_conf = if (databaseData.total_punaw() + databaseData.total_tuway() + databaseData.total_green() > 0) {
+            ((databaseData.total_punaw_conf() * databaseData.total_punaw()) +
+                    (databaseData.total_tuway_conf() * databaseData.total_tuway()) +
+                    (databaseData.total_green_conf() * databaseData.total_green())) /
+                    (databaseData.total_punaw() + databaseData.total_tuway() + databaseData.total_green()).toFloat()
+        } else {
+            0f
+        }
+
+        totalShellsTextView.text = "Total Shells: $totalShells | Confidence: ${String.format("%.2f", total_shell_conf * 100)}%"
 
         val total_classes: TextView = findViewById(R.id.total_classes)
         total_classes.text = buildSpannedString {
@@ -72,26 +92,36 @@ class LogsActivity : AppCompatActivity() {
             bold { append("${databaseData.total_green()}") }
             append(" | Mud: ")
             bold { append("${databaseData.total_tuway()}") }
+            append(" | not shell: ")
+            bold { append("${databaseData.total_notshell()}") }
         }
         databaseData.rows
             .sortedBy { row -> row.datetime }
+            .asReversed()
             .forEach { row ->
+                // Create main row container
                 val rowLayout = LinearLayout(this).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    setPadding(32)
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(16)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
                 }
 
-                val rowTextView = TextView(this).apply {
-                    text = buildSpannedString {
-                        append("Manila: ")
-                        bold { append("${row.punaw}") }
-                        append(", Green: ")
-                        bold { append("${row.greenshell}") }
-                        append(", Mud: ")
-                        bold { append("${row.tuway}") }
-                        append(" \nDate: ${row.datetime}")
-                    }
-                    textSize = 16f
+                // Create table header
+                val headerLayout = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                }
+
+                // Add date and delete button to header
+                val dateTextView = TextView(this).apply {
+                    text = "Date: ${row.datetime}"
+                    textSize = 14f
                     setTextColor(ContextCompat.getColor(context, R.color.dark))
                     layoutParams = LinearLayout.LayoutParams(
                         0,
@@ -102,13 +132,12 @@ class LogsActivity : AppCompatActivity() {
 
                 val deleteButton = Button(this).apply {
                     setCompoundDrawablesWithIntrinsicBounds(
-                        R.drawable.cross, // Your delete icon drawable resource
-                        0, // No top drawable
-                        0, // No right drawable
-                        0  // No bottom drawable
+                        R.drawable.cross,
+                        0,
+                        0,
+                        0
                     )
                     background = null
-
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
@@ -118,11 +147,116 @@ class LogsActivity : AppCompatActivity() {
                     }
                 }
 
-                // Add TextView and Delete button to the row layout
-                rowLayout.addView(rowTextView)
-                rowLayout.addView(deleteButton)
+                headerLayout.addView(dateTextView)
+                headerLayout.addView(deleteButton)
 
-                // Add the row layout to the main linear layout
+                // Create table content
+                val tableLayout = TableLayout(this).apply {
+                    layoutParams = TableLayout.LayoutParams(
+                        TableLayout.LayoutParams.MATCH_PARENT,
+                        TableLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    setStretchAllColumns(true)
+                }
+
+                // Add column headers
+                val headerRow = TableRow(this).apply {
+                    val headers = arrayOf("Type", "Manila", "Mud", "Green")
+                    headers.forEach { header ->
+                        addView(TextView(context).apply {
+                            text = header
+                            textSize = 16f
+                            typeface = Typeface.DEFAULT_BOLD
+                            gravity = Gravity.CENTER
+                            setPadding(8, 8, 8, 8)
+                        })
+                    }
+                }
+
+                // Add count row
+                val countRow = TableRow(this).apply {
+                    addView(TextView(context).apply {
+                        text = "Count"
+                        gravity = Gravity.START
+                        setPadding(8, 8, 8, 8)
+                    })
+                    val counts = arrayOf(row.punaw, row.tuway, row.greenshell)
+                    counts.forEach { count ->
+                        addView(TextView(context).apply {
+                            text = count.toString()
+                            gravity = Gravity.CENTER
+                            setPadding(8, 8, 8, 8)
+                        })
+                    }
+                }
+
+                // Add confidence row
+                val confRow = TableRow(this).apply {
+                    addView(TextView(context).apply {
+                        text = "Confidence"
+                        gravity = Gravity.START
+                        setPadding(8, 8, 8, 8)
+                    })
+                    val confs = arrayOf(row.punaw_conf, row.tuway_conf, row.greenshell_conf)
+                    confs.forEach { conf ->
+                        addView(TextView(context).apply {
+                            text = "${String.format(" % .2f", conf * 100)}%"
+                            gravity = Gravity.CENTER
+                            setPadding(8, 8, 8, 8)
+                        })
+                    }
+                }
+
+                val line = LinearLayout(this).apply {
+                    id = R.id.grrenshell_line
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        topMargin = 10
+                    }
+                    orientation = LinearLayout.HORIZONTAL
+
+                    // Add the left spacing view (5%)
+                    addView(View(context).apply {
+                        layoutParams = LinearLayout.LayoutParams(0, 1).apply {
+                            weight = 0.05f
+                            background = null
+                        }
+                    })
+
+                    // Add the main line (90%)
+                    addView(View(context).apply {
+                        layoutParams = LinearLayout.LayoutParams(0, 1).apply {
+                            weight = 0.9f
+                            setBackgroundColor(Color.BLACK)
+                        }
+                    })
+
+                    // Add the right spacing view (5%)
+                    addView(View(context).apply {
+                        layoutParams = LinearLayout.LayoutParams(0, 1).apply {
+                            weight = 0.05f
+                            background = null
+                        }
+                    })
+                }
+
+                // Add all rows to table
+                tableLayout.apply {
+                    addView(headerRow)
+                    addView(countRow)
+                    addView(confRow)
+                }
+
+                // Add header and table to main layout
+                rowLayout.apply {
+                    addView(headerLayout)
+                    addView(tableLayout)
+                    addView(line)
+                }
+
+                // Add the complete row to the main linear layout
                 linearLayout.addView(rowLayout)
             }
     }
@@ -138,6 +272,7 @@ class LogsActivity : AppCompatActivity() {
                         "- Punaw: ${row.punaw}\n" +
                         "- Green Shell: ${row.greenshell}\n" +
                         "- Tuway: ${row.tuway}\n" +
+                        "- not shell: ${row.notshell}\n" +
                         "Total Shells in this Entry: $totalRowShells"
             )
             .setPositiveButton("Delete") { _, _ ->
